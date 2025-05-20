@@ -11,12 +11,14 @@ class ProductMangaer:
         self.products = []
         self.raw_product = [] 
         self.links = [] 
-
+    
+    # Links sarakstā pievieno visas iespējamās lapaspuses 
     def populate_links(self):
         html = requests.get(self.WEBSITE+"/cenas/portativie-datori")
         soup = BeautifulSoup(html.text,features="lxml") 
         self.links = soup.find("div",{'class':'pages'}).find_all('a')
 
+    # No katras lapas puses iegūst informāciju par productiem html veidā
     def populate_raw_products(self): 
         self.populate_links() 
 
@@ -26,7 +28,8 @@ class ProductMangaer:
             loop_soup = BeautifulSoup(new_html.text,features="lxml")
             self.raw_product.extend(loop_soup.find_all("div",{'class':'prod'}))
             sleep(0.5)
-
+    
+    # metode, kas attīra cenu lai to varētu izmantot kā float
     def get_price(self, price_text):     
         price_text = price_text.replace(" €", "") 
         price_text = price_text.replace(",",".")  
@@ -35,7 +38,7 @@ class ProductMangaer:
         price = float(price_text)
         return price
     
-    
+    # Metode, kas izveido produktu sarakstu 
     def build_product_list(self): 
         self.populate_raw_products() 
         for prod in self.raw_product: 
@@ -74,6 +77,8 @@ def Main():
 
     # Izvada tabulas galveni
     ws.append(["Nr","Nosaukums","Operētāj sistēma", "Cena","Komponentes", "Saite"])
+    
+    #  Inicializē ProductManager metodi
     manager = ProductMangaer() 
     manager.build_product_list() 
 
